@@ -18,7 +18,7 @@ class HypemSpider(scrapy.Spider):
             dateLoved = song.css('.track-info::text').getall()
             dateLoved = dateLoved[1] if 'Found via' in dateLoved[0] else dateLoved[0]
             hypemlink = song.css('.track::attr(href)').get()
-            shortlink = song.css('.download > a::attr(href)').get() or song.css('.download-extra > a::attr(href)').get()
+            sourcelink = song.css('.download > a::attr(href)').get() or song.css('.download-extra > a::attr(href)').get()
 
             songInfo = {
                 'artist': artist, 
@@ -26,15 +26,19 @@ class HypemSpider(scrapy.Spider):
                 'favCount': favCount,
                 'dateLoved': dateLoved,
                 'url': response.urljoin(hypemlink) if hypemlink is not None else None,
+                'source': response.urljoin(sourcelink) if sourcelink is not None else None
             }
             
-            if shortlink is None:
-                yield songInfo
-            else:
-                yield response.follow(shortlink, callback=self.extractTrueUrls, headers=None, meta={'songInfo': songInfo, 'handle_httpstatus_all': True})
+            yield songInfo
 
-    def extractTrueUrls(self, response):
-        songInfo = response.meta['songInfo']
-        songInfo['source'] = response.url
+    # TODO: setup redirect middleware to extract link
+    #         if sourcelink is None:
+    #             yield songInfo
+    #         else:
+    #             yield response.follow(sourcelink, callback=self.extractTrueUrls, meta={'songInfo': songInfo, 'handle_httpstatus_list': [302]})
 
-        yield songInfo
+    # def extractTrueUrls(self, response):
+    #     songInfo = response.meta['songInfo']
+    #     songInfo['source'] = response.url
+
+    #     yield songInfo

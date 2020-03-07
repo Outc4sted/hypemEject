@@ -16,14 +16,14 @@ class HypemejectPipeline(object):
         data['favCount'] = int(favCount)
 
         #source
-        if 'source' in data:
-            data['source'] = '/'.join(data['source'].split("/")[:-1])
+        if data['source'] is not None:
+            data['source'] = data['source'].replace('?utm_source=hypem', '')
 
         #url
         if data['url'] is None:
             del data['url']
         else:
-            data['url'] = data['url'].replace('?utm_source=hypem', '')
+            data['url'] = '/'.join(data['url'].split("/")[:-1])
 
         #dateLoved
         dateLoved = data['dateLoved'].replace('. also loved by ', '').replace('Loved ', '').replace('on ', '').strip()
